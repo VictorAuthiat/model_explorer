@@ -1,0 +1,10 @@
+fr:
+  model_explorer:
+    models:
+      partials:
+        form:
+          select_model: "Sélectionnez un modèle à inspecter"
+          select_prompt: "Sélectionnez un modèle"
+          required_field: "Champ obligatoire"
+          record_id_placeholder: "ID"
+          submit: "Rechercher"

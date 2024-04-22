@@ -1,0 +1,9 @@
+en:
+  model_explorer:
+    models:
+      partials:
+        record_details:
+          title: "Record Details"
+          no_record: "No record selected"
+          copy: "Copy"
+          copy_text: "Copied!"

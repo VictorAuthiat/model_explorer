@@ -1,0 +1,9 @@
+fr:
+  model_explorer:
+    models:
+      partials:
+        record_details:
+          title: "Détails de l'enregistrement"
+          no_record: "Aucun enregistrement sélectionné"
+          copy: "Copier"
+          copy_text: "Copié !"

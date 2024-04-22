@@ -1,0 +1,10 @@
+en:
+  model_explorer:
+    models:
+      partials:
+        form:
+          select_model: "Select a model to inspect"
+          select_prompt: "Select a model"
+          required_field: "Required field"
+          record_id_placeholder: "ID"
+          submit: "Search"

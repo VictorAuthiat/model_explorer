@@ -1,0 +1,6 @@
+fr:
+  model_explorer:
+    models:
+      partials:
+        select_template:
+          select_associations: "Sélectionnez les associations"

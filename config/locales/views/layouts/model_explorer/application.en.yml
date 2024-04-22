@@ -1,0 +1,5 @@
+en:
+  layouts:
+    model_explorer:
+        application:
+          title: "Model Explorer"
