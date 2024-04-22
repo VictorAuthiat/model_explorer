@@ -16,4 +16,5 @@ Devise.setup do |config|
   config.email_regexp = /\A[^@\s]+@[^@\s]+\z/
   config.sign_out_all_scopes = false
   config.sign_out_via = :delete
+  config.secret_key = Rails.application.secret_key_base
 end

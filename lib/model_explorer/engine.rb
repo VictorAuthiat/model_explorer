@@ -4,6 +4,12 @@ module ModelExplorer
   class Engine < ::Rails::Engine
     isolate_namespace ModelExplorer
 
+    config.generators do |g|
+      g.test_framework :rspec
+      g.assets false
+      g.helper false
+    end
+
     initializer "model_explorer.assets.precompile" do |app|
       app.config.assets.precompile += [
         "model_explorer/application.css",
