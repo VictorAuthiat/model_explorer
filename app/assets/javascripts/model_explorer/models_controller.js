@@ -18,7 +18,7 @@ class ModelsController {
 
     this.recordDetailsCopyButton = new CopyButton({
       copyButtonId: 'copy-record-details',
-      targetId: 'json-data'
+      targetId: 'json-pre'
     });
   }
 
