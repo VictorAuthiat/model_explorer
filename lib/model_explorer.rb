@@ -1,8 +1,5 @@
-# frozen_string_literal: true
-
 require_relative "model_explorer/version"
+require_relative "model_explorer/engine" if defined?(Rails)
 
-module ModelExplorer
-  class Error < StandardError; end
-  # Your code goes here...
+module DbInspector
 end
