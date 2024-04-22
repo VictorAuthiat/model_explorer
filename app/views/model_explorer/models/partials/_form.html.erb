@@ -1,0 +1,49 @@
+<span class="h4 my-3 d-block">
+  <%= t(".select_model") %>
+</span>
+
+<%= form_with(
+  url: exports_path,
+  method: :post,
+  local: false,
+  html: {
+    id: "export-form",
+    class: "needs-validation",
+    novalidate: true
+  }
+) do |f| %>
+  <div class="row">
+    <div class="col-9">
+      <%= f.select(
+        :model,
+        models,
+        {prompt: t(".select_prompt"), include_blank: true},
+        {id: "association-select", class: "form-select", required: true}
+      ) %>
+      <div class="invalid-feedback">
+        <%= t(".required_field") %>
+      </div>
+    </div>
+
+    <div class="col-3 pl-0">
+      <%= f.text_field(
+        :record_id,
+        placeholder: t(".record_id_placeholder"),
+        class: "form-control",
+        required: true
+      ) %>
+
+      <div class="invalid-feedback">
+        <%= t(".required_field") %>
+      </div>
+    </div>
+  </div>
+
+  <div id="associations-container" class="my-3"></div>
+
+  <%= render(partial: "model_explorer/models/partials/select_template") %>
+
+  <div class="w-100 my-3">
+    <%= f.submit(t(".submit"), class: "btn btn-primary w-100") %>
+  </div>
+<% end %>

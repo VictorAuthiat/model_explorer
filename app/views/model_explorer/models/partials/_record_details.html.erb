@@ -1,0 +1,25 @@
+<div id="record-details">
+  <span class="h4 my-3 d-block">
+    <%= t(".title") %>
+  </span>
+
+  <div class="vh-50 overflow-auto shadow-sm">
+    <div class="card" id="no-record">
+      <span class="d-block text-center w-100 m-4">
+        <%= t(".no_record") %>
+      </span>
+    </div>
+
+    <div id="json-data" class="position-relative d-none">
+      <button
+        id="copy-record-details"
+        class="btn btn-sm btn-primary position-absolute"
+        data-text="<%= t(".copy_text") %>"
+      >
+        <%= t(".copy") %>
+      </button>
+
+      <pre class="language-json border-none"></pre>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<div class="container">
+  <div class="row g-4">
+    <div class="col-12 col-md-6">
+      <%= render(
+        partial: "model_explorer/models/partials/form",
+        locals: {models: @models}
+      ) %>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <%= render(partial: "model_explorer/models/partials/record_details") %>
+    </div>
+  </div>
+</div>

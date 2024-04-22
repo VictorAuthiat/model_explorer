@@ -1,0 +1,30 @@
+<template id="associations-select-template">
+  <div class="accordion mt-3" id="associations-accordion-TEMP_ID">
+    <div class="card overflow-unset">
+      <button
+        class="card-header btn btn-link btn-block text-decoration-none text-left text-dark"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#associations-collapse-TEMP_ID"
+        aria-expanded="false"
+      ></button>
+
+      <div class="collapse show" id="associations-collapse-TEMP_ID">
+        <div class="card-body" id="associations-container-TEMP_ID">
+          <select
+            id="associations-select-TEMP_ID"
+            class="form-select"
+            data-placeholder="<%= t(".select_associations") %>"
+            multiple
+          >
+
+          <input
+            id="associations-input-TEMP_ID"
+            name="association_attributes[name]"
+            type="hidden"
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
