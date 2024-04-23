@@ -15,4 +15,5 @@ group :development, :test do
   gem "sqlite3"
   gem "sprockets-rails"
   gem "webdrivers"
+  gem "simplecov", require: false
 end

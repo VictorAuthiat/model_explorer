@@ -2,6 +2,7 @@
 
 require "bundler/setup"
 require "model_explorer"
+require "simplecov"
 
 Bundler.setup
 
