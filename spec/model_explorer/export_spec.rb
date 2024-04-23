@@ -45,11 +45,13 @@ RSpec.describe ModelExplorer::Export do
       expect(subject).to match({
         model: "User",
         attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
-        associations: [{name: "posts", type: :has_many, records: []}]
+        associations: [
+          {name: "posts", type: :has_many, records: []}
+        ]
       })
     end
 
-    context "with custom filter attributes regexp" do
+    context "when custom filter attributes regexp is set" do
       around do |example|
         default_regexp = ModelExplorer.configuration.filter_attributes_regexp
         ModelExplorer.configuration.filter_attributes_regexp = /email/
@@ -59,6 +61,70 @@ RSpec.describe ModelExplorer::Export do
 
       it "filters the attributes based on the regexp" do
         expect(subject[:attributes]).to include("email" => "---FILTERED---")
+      end
+    end
+
+    context "when the record has associations and they are included in the export" do
+      before do
+        Post.create!(user: user, title: "foo", content: "bar")
+      end
+
+      let(:export) do
+        described_class.new(
+          record: user,
+          associations: [
+            {name: "posts", associations: []},
+            {name: "first_post", associations: []}
+          ]
+        )
+      end
+
+      it "returns a JSON formatted string of the export data" do
+        expect(subject).to match({
+          model: "User",
+          attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
+          associations: [
+            {
+              name: "posts",
+              type: :has_many,
+              records: [{
+                model: "Post",
+                attributes: hash_including("title" => "foo", "content" => "bar"),
+                associations: []
+              }]
+            },
+            {
+              name: "first_post",
+              type: :has_one,
+              records: [{
+                model: "Post",
+                attributes: hash_including("title" => "foo", "content" => "bar"),
+                associations: []
+              }]
+            }
+          ]
+        })
+      end
+    end
+
+    context "when the record has associations but they are not included in the export" do
+      before do
+        Post.create!(user: user, title: "foo", content: "bar")
+      end
+
+      let(:export) do
+        described_class.new(
+          record: user,
+          associations: []
+        )
+      end
+
+      it "returns a JSON formatted string of the export data" do
+        expect(subject).to match({
+          model: "User",
+          attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
+          associations: []
+        })
       end
     end
   end

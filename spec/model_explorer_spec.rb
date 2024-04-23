@@ -13,7 +13,7 @@ RSpec.describe ModelExplorer do
         model: "User",
         attributes: {id: 1, email: "foo@bar.baz"},
         associations: []
-      }
+      }.to_json
     end
 
     let(:fake_import) { double(:import, import: nil) }
@@ -21,13 +21,21 @@ RSpec.describe ModelExplorer do
     it "builds an import with the given JSON record" do
       expect(ModelExplorer::Import).to(
         receive(:new)
-          .with(json_record)
+          .with(JSON.parse(json_record))
           .and_return(fake_import)
       )
 
       expect(fake_import).to receive(:import)
 
       subject
+    end
+
+    context "when the JSON record is invalid" do
+      let(:json_record) { "invalid" }
+
+      it "raises an error" do
+        expect { subject }.to raise_error(JSON::ParserError)
+      end
     end
   end
 end

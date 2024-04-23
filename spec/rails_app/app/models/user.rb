@@ -3,4 +3,6 @@ class User < ActiveRecord::Base
 
   has_many :posts
   has_many :comments
+
+  has_one :first_post, -> { order(created_at: :asc) }, class_name: "Post"
 end
