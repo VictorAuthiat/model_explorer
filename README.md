@@ -71,6 +71,19 @@ end
 
 By default, the `filter_attributes_regexp` is set to `/password|secret/token/i`.
 
+
+## Importing data
+
+You can import data as follows:
+
+1. Search for a record and its associations.
+2. Copy the result of the search.
+3. Go to your spec file and import the result as follows:
+
+```ruby
+let(:user) { ModelExplorer.import(File.read("spec/fixtures/test_user.json")) }
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
