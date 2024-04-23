@@ -9,6 +9,14 @@ RSpec.feature "Export form", type: :feature do
   let(:copy_button)   { find("#copy-record-details") }
   let(:json_data_pre) { find("#json-pre") }
 
+  let!(:user) do
+    User.create!(email: "foo@bar.baz", password: "password")
+  end
+
+  let!(:user_post) do
+    Post.create!(title: "foo", content: "bar", user: user)
+  end
+
   context "when user submits the form without selecting a model and without record id" do
     before do
       submit_button.click
@@ -69,8 +77,6 @@ RSpec.feature "Export form", type: :feature do
         submit_button.click
       end
 
-      let!(:user) { User.create!(email: "foo@bar.baz", password: "password") }
-
       it "shows the user export", :aggregate_failures do
         expect(json_data_pre).to be_visible
         expect(JSON.parse(json_data_pre.text)).to match({
@@ -109,13 +115,13 @@ RSpec.feature "Export form", type: :feature do
 
     context "when submit the form with a non-existing record id" do
       before do
-        fill_in "record_id", with: 1
+        fill_in "record_id", with: 0
         submit_button.click
       end
 
       it "shows the record not found error" do
         expect(json_data_pre).to be_visible
-        expect(json_data_pre).to have_content("Couldn't find User with 'id'=1")
+        expect(json_data_pre).to have_content("Couldn't find User with 'id'=0")
       end
     end
 
@@ -124,8 +130,6 @@ RSpec.feature "Export form", type: :feature do
         find("#associations-select-user-ts-control").click
         find('div[data-value="posts"]').click
       end
-
-      let!(:user) { User.create!(email: "foo@bar.baz", password: "password") }
 
       it "shows the user posts association select" do
         expect(page).to have_css("#associations-select-user-posts-ts-control")
@@ -143,8 +147,6 @@ RSpec.feature "Export form", type: :feature do
       end
 
       context "and submits the form with a post related to the user" do
-        let!(:user_post) { user.posts.create!(title: "foo", content: "bar") }
-
         it "shows the user export with the post" do
           fill_in "record_id", with: user.id
           submit_button.click
