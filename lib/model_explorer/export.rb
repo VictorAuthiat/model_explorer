@@ -27,7 +27,14 @@ module ModelExplorer
 
     def filtered_attributes
       record.attributes.to_h do |key, value|
-        [key, key.to_s.match?(/password|secret|token/) ? "---FILTERED---" : value]
+        filtered_value =
+          if key.to_s.match?(ModelExplorer.configuration.filter_attributes_regexp)
+            "---FILTERED---"
+          else
+            value
+          end
+
+        [key, filtered_value]
       end
     end
 

@@ -48,5 +48,18 @@ RSpec.describe ModelExplorer::Export do
         associations: [{name: "posts", type: :has_many, records: []}]
       })
     end
+
+    context "with custom filter attributes regexp" do
+      around do |example|
+        default_regexp = ModelExplorer.configuration.filter_attributes_regexp
+        ModelExplorer.configuration.filter_attributes_regexp = /email/
+        example.run
+        ModelExplorer.configuration.filter_attributes_regexp = default_regexp
+      end
+
+      it "filters the attributes based on the regexp" do
+        expect(subject[:attributes]).to include("email" => "---FILTERED---")
+      end
+    end
   end
 end

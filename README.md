@@ -59,6 +59,18 @@ end
 
 The `verify_access_proc` is a lambda that receives the controller instance and returns a boolean value.
 
+## Filter attributes
+
+You can filter sensitive attributes as follows:
+
+```ruby
+ModelExplorer.configure do |config|
+  config.filter_attributes_regexp = /api_key|api_secret/i
+end
+```
+
+By default, the `filter_attributes_regexp` is set to `/password|secret/token/i`.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

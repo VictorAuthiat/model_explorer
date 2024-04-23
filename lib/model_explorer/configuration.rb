@@ -9,12 +9,14 @@ module ModelExplorer
     attr_accessor :basic_auth_username
     attr_accessor :basic_auth_password
     attr_accessor :verify_access_proc
+    attr_accessor :filter_attributes_regexp
 
     def initialize
       @basic_auth_enabled = false
       @basic_auth_username = DEFAULT_BASIC_AUTH_USERNAME
       @basic_auth_password = DEFAULT_BASIC_AUTH_PASSWORD
       @verify_access_proc = ->(_controller) { true }
+      @filter_attributes_regexp = /password|secret|token/i
     end
 
     def basic_auth_enabled?
