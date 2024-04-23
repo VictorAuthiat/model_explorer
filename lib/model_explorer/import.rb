@@ -1,53 +1,64 @@
 module ModelExplorer
   class Import
-    attr_reader :json_record
+    FAKE_PASSWORD = "FakePa$$word12345!"
 
-    # @param json_record [String] JSON representation of the record
-    def initialize(json_record)
-      @json_record = json_record
+    attr_reader :record_data
+    attr_reader :record
+    attr_reader :model
+
+    # @param record_data [String] JSON representation of the record
+    def initialize(record_data)
+      @record_data = record_data
+      @record = nil
+      @model = nil
     end
 
     # @return [ActiveRecord::Base]
     def import
-      record_data = JSON.parse(json_record)
+      @model = record_data[:model].constantize
+      @record = model.find_or_initialize_by(record_data[:attributes])
 
-      import_record(record_data)
-    end
-
-    private
-
-    def import_record(record_data)
-      import_associations_with_macros(record_data, :belongs_to)
-
-      model = record_data["model"].constantize
-      record = model.new(record_data["attributes"])
-
-      if defined?(Devise) && model.included_modules.include?(Devise::Models::DatabaseAuthenticatable)
-        record.password = "FakePa$$word12345!"
-        record.password_confirmation = "FakePa$$word12345!"
-      end
-
-      record.save!
-
-      import_associations_with_macros(record_data, :has_many, :has_one)
+      create_record_with_associations!
 
       record
     end
 
-    def import_associations_with_macros(record_data, *macros)
-      macros_associations = record_data["associations"].select do |association|
-        record_data["model"]
-          .constantize
-          .reflect_on_association(association["name"])
-          .macro
-          .in?(macros)
-      end
+    private
 
-      macros_associations.each do |association|
-        association["records"].each do |record_data|
-          import_record(record_data)
-        end
+    def create_record_with_associations!
+      ActiveRecord::Base.transaction do
+        import_associations_with_macros(:belongs_to)
+        set_devise_password if defined?(Devise)
+        record.save!
+        import_associations_with_macros(:has_many, :has_one)
       end
+    end
+
+    def import_associations_with_macros(*macros)
+      with_macros_associations(macros) do |association|
+        import_records(association)
+      end
+    end
+
+    def with_macros_associations(macros)
+      record_data[:associations].each do |association|
+        next unless model.reflect_on_association(association[:name]).macro.in?(macros)
+
+        yield association
+      end
+    end
+
+    def import_records(association)
+      association[:records].each do |record_data|
+        self.class.new(record_data).import
+      end
+    end
+
+    def set_devise_password
+      return unless model.included_modules.include?(Devise::Models::DatabaseAuthenticatable)
+
+      record.password = FAKE_PASSWORD
+      record.password_confirmation = FAKE_PASSWORD
     end
   end
 end

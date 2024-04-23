@@ -19,7 +19,9 @@ module ModelExplorer
     # @param json_record [String] JSON record
     # @return [ActiveRecord::Base]
     def import(json_record)
-      Import.new(json_record).import
+      record_data = JSON.parse(json_record)
+
+      Import.new(record_data).import
     end
   end
 end
