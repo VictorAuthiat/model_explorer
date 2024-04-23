@@ -1,24 +1,63 @@
 # ModelExplorer
 
-TODO: Delete this and the text below, and describe your gem
+Rails gem to explore models attributes and their associations.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/model_explorer`. To experiment with that code, run `bin/console` for an interactive prompt.
+![Example](docs/example.png)
+
+Most of the time, the production database is not accessible, which makes debugging difficult. This gem gives you read access to the database by searching for a record and its associations.
+You can also copy the result of a search and import it to test behavior from another test db.
+
+It is highly recommended to use the basic auth feature to protect access to the search form.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add model_explorer
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+    $ gem install model_explorer
 
 ## Usage
 
-TODO: Write usage instructions here
+Add the following line to the `config/routes.rb` file:
+
+```ruby
+mount ModelExplorer::Engine => "/model_explorer"
+```
+
+### Basic Auth
+
+To protect access to the search form, you can use the basic auth feature.
+
+Add an initializer file `config/initializers/model_explorer.rb` with the following content:
+
+```ruby
+ModelExplorer.configure do |config|
+  config.basic_auth_enabled = true
+  config.basic_auth_username = "admin"
+  config.basic_auth_password = "password"
+end
+```
+
+The basic auth feature is disabled by default.
+
+### Custom Access Control
+
+You can also define a custom access control to restrict access to the search form.
+
+Add an initializer file `config/initializers/model_explorer.rb` with the following content:
+
+```ruby
+ModelExplorer.configure do |config|
+  config.verify_access_proc = ->(_controller) do
+    current_admin_user&.super_admin?
+  end
+end
+```
+
+The `verify_access_proc` is a lambda that receives the controller instance and returns a boolean value.
 
 ## Development
 
