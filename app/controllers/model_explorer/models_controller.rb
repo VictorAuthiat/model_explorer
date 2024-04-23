@@ -17,9 +17,17 @@ module ModelExplorer
     private
 
     def fetch_models
+      load_models_if_needed
+
       ActiveRecord::Base.descendants.reject do |descendant|
         descendant.name.match(/HABTM/) || descendant.abstract_class?
       end
+    end
+
+    def load_models_if_needed
+      return if ActiveRecord::Base.descendants.any?
+
+      ActiveRecord.eager_load!
     end
 
     def build_associations(model)
