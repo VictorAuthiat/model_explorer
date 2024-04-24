@@ -46,7 +46,7 @@ RSpec.describe ModelExplorer::Export do
         model: "User",
         attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
         associations: [
-          {name: "posts", type: :has_many, records: []}
+          {name: :posts, type: :has_many, records: []}
         ]
       })
     end
@@ -73,8 +73,8 @@ RSpec.describe ModelExplorer::Export do
         described_class.new(
           record: user,
           associations: [
-            {name: "posts", associations: []},
-            {name: "first_post", associations: []}
+            {name: :posts, associations: []},
+            {name: :first_post, associations: []}
           ]
         )
       end
@@ -85,7 +85,7 @@ RSpec.describe ModelExplorer::Export do
           attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
           associations: [
             {
-              name: "posts",
+              name: :posts,
               type: :has_many,
               records: [{
                 model: "Post",
@@ -94,7 +94,7 @@ RSpec.describe ModelExplorer::Export do
               }]
             },
             {
-              name: "first_post",
+              name: :first_post,
               type: :has_one,
               records: [{
                 model: "Post",

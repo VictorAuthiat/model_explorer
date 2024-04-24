@@ -108,7 +108,7 @@ RSpec.describe "POST /model_explorer/export", type: :request do
             associations: {
               "0" => {
                 association_attributes: {
-                  name: "invalid",
+                  name: "destroy",
                   associations: {}
                 }
               }
@@ -121,7 +121,11 @@ RSpec.describe "POST /model_explorer/export", type: :request do
 
       it "returns an error message" do
         subject
-        expect(JSON.parse(response.body)["error"]).to be_present
+        expect(JSON.parse(response.body)["error"]).to eq("Unknown association destroy")
+      end
+
+      it "does not destroy the user" do
+        expect { subject }.not_to change(User, :count)
       end
     end
 

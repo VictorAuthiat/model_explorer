@@ -2,6 +2,8 @@
 
 module ModelExplorer
   class ExportsController < ApplicationController
+    # Warning: all parameters are permitted.
+    # Associations must not be called directly on the record.
     def create
       record = params[:model].constantize.find(params[:record_id])
       associations = build_associations(params.permit!.to_h)

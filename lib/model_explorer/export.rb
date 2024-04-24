@@ -40,9 +40,13 @@ module ModelExplorer
 
     def record_associations
       associations.map do |association|
+        reflection = record.class.reflect_on_association(association[:name])
+
+        raise "Unknown association #{association[:name]}" unless reflection
+
         {
-          name: association[:name],
-          type: record.class.reflect_on_association(association[:name]).macro,
+          name: reflection.name,
+          type: reflection.macro,
           records: build_association_export(association)
         }
       end
