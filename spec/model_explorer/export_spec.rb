@@ -12,6 +12,14 @@ RSpec.describe ModelExplorer::Export do
       expect(subject.record).to eq(user)
       expect(subject.associations).to eq(associations)
     end
+
+    context "when record is not a valid ActiveRecord model" do
+      let(:user) { double(:user) }
+
+      it "raises an error" do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
   end
 
   describe "#to_json" do

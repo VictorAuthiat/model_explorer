@@ -9,6 +9,10 @@ module ModelExplorer
       @record = record
       @associations = associations
       @data = nil
+
+      unless record.is_a?(ApplicationRecord)
+        raise ArgumentError, "Record must be an ActiveRecord model"
+      end
     end
 
     def to_json(*)

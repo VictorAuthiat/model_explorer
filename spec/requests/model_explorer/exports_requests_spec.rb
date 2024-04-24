@@ -23,6 +23,23 @@ RSpec.describe "POST /model_explorer/export", type: :request do
     end
   end
 
+  context "when model class exist but is not an ApplicationRecord model" do
+    let(:params) do
+      {
+        model: "RailsApp::Application",
+        record_id: 1,
+        association_attributes: {}
+      }
+    end
+
+    it { is_expected.to have_http_status(:bad_request) }
+
+    it "returns an error message" do
+      subject
+      expect(JSON.parse(response.body)["error"]).to be_present
+    end
+  end
+
   context "when an unknown error occurs" do
     let(:params) do
       {
