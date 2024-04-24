@@ -19,7 +19,7 @@ module ModelExplorer
     def fetch_models
       load_models_if_needed
 
-      ActiveRecord::Base.descendants.reject do |descendant|
+      ApplicationRecord.descendants.reject do |descendant|
         descendant.name.match(/HABTM/) || descendant.abstract_class?
       end
     end
