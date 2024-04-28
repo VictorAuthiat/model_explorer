@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+ModelExplorer.configure do |config|
+  # Enable the basic auth. Disabled by default.
+  # config.basic_auth_enabled = true
+  # config.basic_auth_username = "admin"
+  # config.basic_auth_password = "password"
+
+  # Add a custom proc to verify the access.
+  # config.verify_access_proc = ->(controller) do
+  #   controller.current_admin_user&.super_admin?
+  # end
+
+  # Customize the regular expression for filtering attributes.
+  # config.filter_attributes_regexp = /password|token|secret/i
+end

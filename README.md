@@ -11,17 +11,27 @@ It is highly recommended to use the basic auth feature to protect access to the 
 
 ## Installation
 
-Install the gem and add to the application's Gemfile by executing:
+Add this line to your application's Gemfile:
 
-    $ bundle add model_explorer
+```ruby
+gem "model_explorer"
+```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+And then execute:
 
-    $ gem install model_explorer
+```bash
+$ bundle install
+```
 
-## Usage
+Run the following command to install the gem:
 
-Add the following line to the `config/routes.rb` file:
+```bash
+$ bin/rails model_explorer:install
+```
+
+This command will copy the initializer file to `config/initializers/model_explorer.rb`.
+
+Add `--routes` to the command to add the engine routes to the `config/routes.rb` file or add the following line manually:
 
 ```ruby
 mount ModelExplorer::Engine => "/model_explorer"
@@ -31,7 +41,7 @@ mount ModelExplorer::Engine => "/model_explorer"
 
 To protect access to the search form, you can use the basic auth feature.
 
-Add an initializer file `config/initializers/model_explorer.rb` with the following content:
+Uncomment the following lines in the initializer file to enable the feature:
 
 ```ruby
 ModelExplorer.configure do |config|
@@ -41,18 +51,16 @@ ModelExplorer.configure do |config|
 end
 ```
 
-The basic auth feature is disabled by default.
-
 ### Custom Access Control
 
 You can also define a custom access control to restrict access to the search form.
 
-Add an initializer file `config/initializers/model_explorer.rb` with the following content:
+Uncomment the following lines in the initializer file to enable verification:
 
 ```ruby
 ModelExplorer.configure do |config|
-  config.verify_access_proc = ->(_controller) do
-    current_admin_user&.super_admin?
+  config.verify_access_proc = ->(controller) do
+    controller.current_admin_user&.super_admin?
   end
 end
 ```

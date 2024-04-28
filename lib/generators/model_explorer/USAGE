@@ -1,0 +1,7 @@
+Description:
+    Generates an initializer to configure ModelExplorer and mount the engine in the routes file.
+
+Example:
+    `bin/rails generate model_explorer:install --routes
+      create  config/initializers/model_explorer.rb
+       route  mount ModelExplorer::Engine, at: "/model_explorer"`
