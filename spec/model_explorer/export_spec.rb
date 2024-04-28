@@ -54,17 +54,23 @@ RSpec.describe ModelExplorer::Export do
         model: "User",
         attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
         associations: [
-          {name: :posts, type: :has_many, records: []}
+          {
+            name: :posts,
+            type: :has_many,
+            scopes: [],
+            records: [],
+            count: 0
+          }
         ]
       })
     end
 
     context "when custom filter attributes regexp is set" do
       around do |example|
-        default_regexp = ModelExplorer.configuration.filter_attributes_regexp
-        ModelExplorer.configuration.filter_attributes_regexp = /email/
+        default_regexp = ModelExplorer.filter_attributes_regexp
+        ModelExplorer.filter_attributes_regexp = /email/
         example.run
-        ModelExplorer.configuration.filter_attributes_regexp = default_regexp
+        ModelExplorer.filter_attributes_regexp = default_regexp
       end
 
       it "filters the attributes based on the regexp" do
@@ -95,6 +101,8 @@ RSpec.describe ModelExplorer::Export do
             {
               name: :posts,
               type: :has_many,
+              scopes: [],
+              count: 1,
               records: [{
                 model: "Post",
                 attributes: hash_including("title" => "foo", "content" => "bar"),
@@ -112,6 +120,92 @@ RSpec.describe ModelExplorer::Export do
             }
           ]
         })
+      end
+
+      context "and the association has scopes" do
+        let(:export) do
+          described_class.new(
+            record: user,
+            associations: [
+              {
+                name: :comments,
+                scopes: ["published"],
+                associations: [
+                  {
+                    name: :post,
+                    associations: [],
+                    scopes: []
+                  }
+                ]
+              }
+            ]
+          )
+        end
+
+        before do
+          post = Post.create!(user: user, title: "foo", content: "bar")
+          user.comments.create!(content: "baz", status: :draft, post: post)
+          user.comments.create!(content: "baz", status: :published, post: post)
+        end
+
+        it "returns a JSON formatted string of the export data with the scoped records" do
+          expect(subject).to match({
+            model: "User",
+            attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
+            associations: [
+              {
+                name: :comments,
+                type: :has_many,
+                count: 1,
+                scopes: ["published"],
+                records: [
+                  {
+                    model: "Comment",
+                    attributes: hash_including("content" => "baz", "status" => "published"),
+                    associations: [
+                      {
+                        name: :post,
+                        type: :belongs_to,
+                        records: [
+                          {
+                            model: "Post",
+                            attributes: hash_including("title" => "foo", "content" => "bar"),
+                            associations: []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          })
+        end
+      end
+
+      context "and the association has invalid scopes" do
+        let(:export) do
+          described_class.new(
+            record: user,
+            associations: [
+              {
+                name: :comments,
+                scopes: ["destroy_all"],
+                associations: []
+              }
+            ]
+          )
+        end
+
+        before do
+          post = Post.create!(user: user, title: "foo", content: "bar")
+          user.comments.create!(content: "baz", status: :draft, post: post)
+          user.comments.create!(content: "baz", status: :published, post: post)
+        end
+
+        it "raises an ArgumentError" do
+          expect { subject }.to raise_error(ArgumentError, "Unknown scope destroy_all for Comment")
+        end
       end
     end
 

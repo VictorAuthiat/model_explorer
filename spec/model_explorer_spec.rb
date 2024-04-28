@@ -5,6 +5,14 @@ RSpec.describe ModelExplorer do
     expect(ModelExplorer::VERSION).not_to be nil
   end
 
+  describe ".configure" do
+    it "yields self" do
+      expect { |b| described_class.configure(&b) }.to(
+        yield_with_args(described_class)
+      )
+    end
+  end
+
   describe ".import" do
     subject { described_class.import(json_record) }
 

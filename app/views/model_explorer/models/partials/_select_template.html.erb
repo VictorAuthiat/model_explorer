@@ -12,11 +12,19 @@
       <div class="collapse show" id="associations-collapse-TEMP_ID">
         <div class="card-body" id="associations-container-TEMP_ID">
           <select
+            id="scopes-select-TEMP_ID"
+            class="form-select mb-3"
+            data-placeholder="<%= t(".select_scopes") %>"
+            multiple
+          ></select>
+
+          <select
             id="associations-select-TEMP_ID"
+            name="association_attributes[scopes][]"
             class="form-select"
             data-placeholder="<%= t(".select_associations") %>"
             multiple
-          >
+          ></select>
 
           <input
             id="associations-input-TEMP_ID"

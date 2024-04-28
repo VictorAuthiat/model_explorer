@@ -79,7 +79,6 @@ end
 
 By default, the `filter_attributes_regexp` is set to `/password|secret/token/i`.
 
-
 ## Importing data
 
 You can import data as follows:

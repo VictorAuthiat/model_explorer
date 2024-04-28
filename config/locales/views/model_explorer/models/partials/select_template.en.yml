@@ -4,3 +4,4 @@ en:
       partials:
         select_template:
           select_associations: "Select associations"
+          select_scopes: "Select scopes"

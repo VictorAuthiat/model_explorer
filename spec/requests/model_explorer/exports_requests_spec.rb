@@ -180,6 +180,8 @@ RSpec.describe "POST /model_explorer/export", type: :request do
               {
                 "name" => "posts",
                 "type" => "has_many",
+                "scopes" => [],
+                "count" => 1,
                 "records" => [
                   {
                     "model" => "Post",

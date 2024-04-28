@@ -163,12 +163,70 @@ RSpec.feature "Export form", type: :feature do
               "associations" => [{
                 "name" => "posts",
                 "type" => "has_many",
+                "scopes" => [],
+                "count" => 1,
                 "records" => [{
                   "model" => "Post",
                   "attributes" => hash_including(
                     "id" => user_post.id,
                     "title" => user_post.title,
                     "content" => user_post.content
+                  ),
+                  "associations" => []
+                }]
+              }]
+            })
+          end
+        end
+      end
+    end
+  end
+
+  describe "Scopes select" do
+    context "when user selects the comments association" do
+      before do
+        model_select.click
+        user_option.click
+        find("#associations-select-user-ts-control").click
+        find('div[data-value="comments"]').click
+
+        user.comments.create!(content: "foo", status: "draft", post: user_post)
+        user.comments.create!(content: "bar", status: "published", post: user_post)
+      end
+
+      it "shows the scopes select" do
+        expect(page).to have_css("#scopes-select-user-comments-ts-control")
+      end
+
+      context "and submit with published comments scope" do
+        before do
+          find("#scopes-select-user-comments-ts-control").click
+          find('div[data-value="published"]').click
+        end
+
+        it "shows the user export with the published comments" do
+          fill_in "record_id", with: user.id
+          submit_button.click
+
+          aggregate_failures do
+            expect(json_data_pre).to be_visible
+            expect(JSON.parse(json_data_pre.text)).to match({
+              "model" => "User",
+              "attributes" => hash_including(
+                "id" => user.id,
+                "email" => user.email,
+                "encrypted_password" => "---FILTERED---"
+              ),
+              "associations" => [{
+                "name" => "comments",
+                "type" => "has_many",
+                "scopes" => ["published"],
+                "count" => 1,
+                "records" => [{
+                  "model" => "Comment",
+                  "attributes" => hash_including(
+                    "content" => "bar",
+                    "status" => "published"
                   ),
                   "associations" => []
                 }]

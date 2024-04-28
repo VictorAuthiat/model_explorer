@@ -5,11 +5,11 @@ RSpec.describe ModelExplorer::ApplicationController, type: :request do
     subject { get "/model_explorer", headers: headers }
 
     around do |example|
-      ModelExplorer.configuration.basic_auth_enabled = basic_auth_enabled
-      ModelExplorer.configuration.basic_auth_username = "admin"
-      ModelExplorer.configuration.basic_auth_password = "password"
+      ModelExplorer.basic_auth_enabled = basic_auth_enabled
+      ModelExplorer.basic_auth_username = "admin"
+      ModelExplorer.basic_auth_password = "password"
       example.run
-      ModelExplorer.configuration.basic_auth_enabled = false
+      ModelExplorer.basic_auth_enabled = false
     end
 
     let(:headers) { {"HTTP_AUTHORIZATION" => credentials} }
@@ -61,7 +61,7 @@ RSpec.describe ModelExplorer::ApplicationController, type: :request do
 
     context "when access is granted" do
       before do
-        ModelExplorer.configuration.verify_access_proc = ->(_controller) { true }
+        ModelExplorer.verify_access_proc = ->(_controller) { true }
       end
 
       it "allows access" do
@@ -72,9 +72,9 @@ RSpec.describe ModelExplorer::ApplicationController, type: :request do
 
     context "when access is denied" do
       around do |example|
-        ModelExplorer.configuration.verify_access_proc = ->(_controller) { false }
+        ModelExplorer.verify_access_proc = ->(_controller) { false }
         example.run
-        ModelExplorer.configuration.verify_access_proc = ->(_controller) { true }
+        ModelExplorer.verify_access_proc = ->(_controller) { true }
       end
 
       it "redirects to the root path with flash error", :aggregate_failures do

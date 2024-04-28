@@ -9,8 +9,8 @@ module ModelExplorer
       associations = build_associations(params.permit!.to_h)
 
       render json: ModelExplorer::Export.new(record: record, associations: associations)
-    rescue => e
-      render json: {error: e.message}, status: :bad_request
+    rescue => error
+      render json: {error: error.message}, status: :bad_request
     end
 
     private
@@ -19,11 +19,18 @@ module ModelExplorer
       associations = associations_params.dig("association_attributes", "associations") || {}
 
       associations.map do |_index, association_params|
-        {
-          name: association_params["association_attributes"]["name"],
-          associations: build_associations(association_params)
-        }
+        build_association(association_params)
       end
+    end
+
+    def build_association(association_params)
+      attributes = association_params["association_attributes"]
+
+      {
+        name: attributes["name"],
+        scopes: attributes["scopes"],
+        associations: build_associations(association_params)
+      }
     end
   end
 end

@@ -23,7 +23,7 @@ module ModelExplorer
       @data ||= {
         model: record.class.name,
         attributes: filtered_attributes,
-        associations: record_associations
+        associations: fetch_associations
       }
     end
 
@@ -32,7 +32,7 @@ module ModelExplorer
     def filtered_attributes
       record.attributes.to_h do |key, value|
         filtered_value =
-          if key.to_s.match?(ModelExplorer.configuration.filter_attributes_regexp)
+          if key.to_s.match?(ModelExplorer.filter_attributes_regexp)
             "---FILTERED---"
           else
             value
@@ -42,37 +42,11 @@ module ModelExplorer
       end
     end
 
-    def record_associations
+    def fetch_associations
       associations.map do |association|
         reflection = record.class.reflect_on_association(association[:name])
 
-        raise "Unknown association #{association[:name]}" unless reflection
-
-        {
-          name: reflection.name,
-          type: reflection.macro,
-          records: build_association_export(association)
-        }
-      end
-    end
-
-    def build_association_export(association)
-      relation = record.public_send(association[:name])
-
-      case relation
-      when ActiveRecord::Base
-        build_export(association, [relation])
-      when ActiveRecord::Relation
-        build_export(association, relation)
-      end
-    end
-
-    def build_export(association, relation)
-      relation.map do |relation_record|
-        ModelExplorer::Export.new(
-          record: relation_record,
-          associations: association[:associations]
-        ).data
+        ModelExplorer::Associations.build(record, reflection, association).export
       end
     end
   end

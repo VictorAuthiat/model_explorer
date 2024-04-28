@@ -8,34 +8,47 @@ module ModelExplorer
 
     def show
       model = params[:id].constantize
+      macro = params[:macro]
 
-      render json: {model: model.name, associations: build_associations(model)}
-    rescue NameError
-      render json: {model: params[:id], associations: []}
+      render json: {
+        model: model.name,
+        scopes: build_scopes(model, macro),
+        associations: build_associations(model)
+      }
+    rescue => error
+      render json: {error: error.message}, status: :bad_request
     end
 
     private
 
     def fetch_models
-      load_models_if_needed
-
       ApplicationRecord.descendants.reject do |descendant|
-        descendant.name.match(/HABTM/) || descendant.abstract_class?
+        descendant_name = descendant.name
+
+        descendant_name.blank? ||
+          descendant_name.match(/HABTM/) ||
+          descendant.abstract_class?
       end
-    end
-
-    def load_models_if_needed
-      return if ActiveRecord::Base.descendants.any?
-
-      ActiveRecord.eager_load!
     end
 
     def build_associations(model)
       model.reflect_on_all_associations.map do |association|
+        association_name = association.name
+
         {
-          name: association.name,
-          model: association.class_name || association.name.classify
+          name: association_name,
+          macro: association.macro,
+          model: association.class_name || association_name.classify
         }
+      end
+    end
+
+    def build_scopes(model, macro)
+      case macro
+      when "has_many"
+        model.model_explorer_scopes.map(&:to_s)
+      else
+        []
       end
     end
   end

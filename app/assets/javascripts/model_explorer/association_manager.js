@@ -7,7 +7,8 @@ class AssociationManager {
     try {
       const option = associationSelect.selectElement.querySelector(`option[value="${association}"]`);
       const modelName = option.dataset.model || option.value;
-      const response = await fetch(`/model_explorer/models/${modelName}`);
+      const macroName = option.dataset.macro;
+      const response = await fetch(`/model_explorer/models/${modelName}?macro=${macroName}`);
       const data = await response.json();
 
       this.addAssociationsSelect(option, associationSelect, data);
@@ -29,8 +30,10 @@ class AssociationManager {
     newContainer.querySelector('.card-header').textContent = option.value;
 
     this._populateInputs(newContainer, associationSelect, option);
-    this._populateSelect(newContainer, data.associations, associationId);
+    this._populateAssociationsSelect(newContainer, data.associations, associationId);
     this._initializeNewAssociationSelect(newContainer, associationId, associationSelect);
+    this._populateScopesSelect(newContainer, data.scopes, associationId);
+    this._initializeNewScopeSelect(newContainer, associationId, associationSelect);
   }
 
   removeAssociation(associationSelect, association) {
@@ -76,8 +79,8 @@ class AssociationManager {
     input.value = option.value;
   }
 
-  _populateSelect(container, associations, associationId) {
-    const select = container.querySelector('select');
+  _populateAssociationsSelect(container, associations, associationId) {
+    const select = container.querySelector(`#associations-select-${associationId}`);
 
     select.setAttribute('data-relation', associationId);
 
@@ -86,6 +89,20 @@ class AssociationManager {
       option.value = assoc.name;
       option.textContent = assoc.name;
       option.dataset.model = assoc.model;
+      option.dataset.macro = assoc.macro;
+      select.appendChild(option);
+    });
+  }
+
+  _populateScopesSelect(container, scopes, associationId) {
+    const select = container.querySelector(`#scopes-select-${associationId}`);
+
+    select.setAttribute('data-relation', associationId);
+
+    scopes.forEach(scope => {
+      const option = document.createElement('option');
+      option.value = scope;
+      option.textContent = scope;
       select.appendChild(option);
     });
   }
@@ -100,5 +117,22 @@ class AssociationManager {
     });
 
     newAssociationSelect.initialize(this, { maxItems: 5 });
+  }
+
+  _initializeNewScopeSelect(container, associationId, associationSelect) {
+    const parentInputs = associationSelect.associationContainer.querySelectorAll('input:not([id*="ts-control"])');
+    const select = container.querySelector(`#scopes-select-${associationId}`);
+
+    if (select.children.length === 0 || (parentInputs.length - 1) === 0) {
+      select.remove();
+      return;
+    }
+
+    select.setAttribute('data-index', parentInputs.length - 1);
+    const name = this._constructName(select, associationSelect).replace('[name]', '[scopes][]');
+    select.name = name
+
+    associationSelect.associationContainer.appendChild(container);
+    new TomSelect(`#scopes-select-${associationId}`, { maxItems: 5 });
   }
 }
