@@ -1,5 +1,7 @@
 # ModelExplorer
 
+[![Build Status](https://github.com/victorauthiat/model_explorer/actions/workflows/build.yml/badge.svg)](https://github.com/victorauthiat/model_explorer/actions/workflows/build.yml)
+
 Rails gem to explore models attributes and their associations.
 
 ![Example](docs/example.png)
