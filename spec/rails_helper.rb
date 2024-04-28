@@ -15,7 +15,7 @@ require "rspec/rails"
 require "capybara/rspec"
 
 Capybara.server = :webrick
-Capybara.default_driver = :selenium_chrome
+Capybara.default_driver = ENV.fetch("CAPYBARA_DRIVER", "selenium_chrome").to_sym
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 

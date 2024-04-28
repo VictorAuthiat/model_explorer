@@ -93,16 +93,26 @@ RSpec.feature "Export form", type: :feature do
       context "and the user clicks the 'Copy' button" do
         before do
           copy_button.click
-        end
 
-        it "copies the JSON data to the clipboard", :aggregate_failures do
           page.driver.browser.execute_cdp(
             "Browser.setPermission",
             origin: page.server_url,
             permission: {name: "clipboard-read"},
             setting: "granted"
           )
+        end
 
+        after do
+          page.evaluate_script("navigator.clipboard.writeText('')")
+          page.driver.browser.execute_cdp(
+            "Browser.setPermission",
+            origin: page.server_url,
+            permission: {name: "clipboard-read"},
+            setting: "denied"
+          )
+        end
+
+        it "copies the JSON data to the clipboard", :aggregate_failures do
           clip_text = page.evaluate_async_script(
             "navigator.clipboard.readText().then(arguments[0])"
           )

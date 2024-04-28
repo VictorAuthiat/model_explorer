@@ -13,8 +13,9 @@ group :development, :test do
   gem "debug"
   gem "devise"
   gem "rspec-rails"
-  gem "sqlite3"
+  gem "sqlite3", "~> 1.4", platforms: :ruby
   gem "sprockets-rails"
   gem "webdrivers"
   gem "simplecov", require: false
+  gem "simplecov-json", require: false
 end

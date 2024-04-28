@@ -1,0 +1,41 @@
+name: "Build"
+
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    name: "Tests"
+    strategy:
+      matrix:
+        ruby:
+          - "3.1"
+          - "3.2"
+          - "3.3"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - name: Setup ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: "Run specs"
+        run: CAPYBARA_DRIVER=selenium_chrome_headless bundle exec rspec --format progress
+
+      - name: "Check coverage"
+        if: matrix.ruby == '3.1'
+        uses: joshmfrankel/simplecov-check-action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

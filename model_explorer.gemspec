@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Rails engine to explore models and their associations"
   spec.description = "Rails engine to explore models and their associations"
-  spec.homepage = "https://github.com/capsens/model_explorer"
+  spec.homepage = "https://github.com/victorauthiat/model_explorer"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 
