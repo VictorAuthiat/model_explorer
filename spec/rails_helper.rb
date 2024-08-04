@@ -14,6 +14,27 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require "rspec/rails"
 require "capybara/rspec"
 
+Capybara.register_driver(:selenium_chrome) do |app|
+  options = Selenium::WebDriver::Chrome::Options.new(
+    args: %w[--disable-search-engine-choice-screen]
+  )
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+
+Capybara.register_driver(:selenium_chrome_headless) do |app|
+  options = Selenium::WebDriver::Chrome::Options.new(
+    args: %w[
+      --headless=new
+      --no-sandbox
+      --disable-gpu
+      --disable-search-engine-choice-screen
+    ]
+  )
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+
 Capybara.server = :webrick
 Capybara.default_driver = ENV.fetch("CAPYBARA_DRIVER", "selenium_chrome").to_sym
 
