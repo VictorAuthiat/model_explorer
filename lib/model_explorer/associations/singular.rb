@@ -9,8 +9,10 @@ module ModelExplorer
         }
       end
 
-      def relation
-        [default_relation].compact
+      private
+
+      def query
+        default_query.limit(1)
       end
     end
   end

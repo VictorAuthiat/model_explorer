@@ -39,3 +39,13 @@ pre#json-pre {
   border-color: #86b7fe;
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25)
 }
+
+.ts-control input {
+  line-height: 1.5 !important;
+  padding: 0.01rem .75rem !important;
+}
+
+.ts-control {
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}

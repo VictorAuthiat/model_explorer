@@ -7,7 +7,9 @@ require_relative "model_explorer/associations"
 module ModelExplorer
   autoload :Export, "model_explorer/export"
   autoload :Import, "model_explorer/import"
+  autoload :Record, "model_explorer/record"
   autoload :Scopes, "model_explorer/scopes"
+  autoload :Select, "model_explorer/select"
 
   # Custom proc to verify access to the form
   # @param controller [ActionController::Base]
@@ -34,5 +36,15 @@ module ModelExplorer
     record_data = JSON.parse(json_record)
 
     Import.new(record_data).import
+  end
+
+  def self.models
+    ApplicationRecord.descendants.reject do |descendant|
+      descendant_name = descendant.name
+
+      descendant_name.blank? ||
+        descendant_name.match(/HABTM/) ||
+        descendant.abstract_class?
+    end
   end
 end

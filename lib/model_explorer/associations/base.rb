@@ -17,18 +17,35 @@ module ModelExplorer
         raise NotImplementedError
       end
 
-      def relation
-        raise NotImplementedError
+      def records
+        @_records ||= klass.connection.exec_query(query.to_sql).map do |record|
+          ModelExplorer::Record.new(record, klass)
+        end
       end
 
       protected
 
-      def default_relation
-        record.public_send(name)
+      def query
+        raise NotImplementedError
+      end
+
+      def default_query
+        klass
+          .select(ModelExplorer::Select.new(klass, association[:columns]).to_a)
+          .where(reflection_query)
+      end
+
+      def reflection_query
+        foreign_key = reflection.foreign_key
+
+        case reflection.macro
+        when :has_many, :has_one then {foreign_key => record[:id]}
+        when :belongs_to then {"#{reflection.table_name}.id" => record[foreign_key]}
+        end
       end
 
       def export_records
-        relation.map do |relation_record|
+        records.map do |relation_record|
           ModelExplorer::Export.new(
             record: relation_record,
             associations: association[:associations]

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "rails_helper"
+
 RSpec.describe ModelExplorer do
   it "has a version number" do
     expect(ModelExplorer::VERSION).not_to be nil
@@ -44,6 +46,18 @@ RSpec.describe ModelExplorer do
       it "raises an error" do
         expect { subject }.to raise_error(JSON::ParserError)
       end
+    end
+  end
+
+  describe ".models" do
+    subject { described_class.models }
+
+    it "returns all ApplicationRecord descendants" do
+      expect(subject).to eq([User, Post, Comment])
+    end
+
+    it "excludes abstract classes" do
+      expect(subject).not_to include(ApplicationRecord)
     end
   end
 end

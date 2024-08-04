@@ -5,32 +5,23 @@ module ModelExplorer
     # Warning: all parameters are permitted.
     # Associations must not be called directly on the record.
     def create
-      record = params[:model].constantize.find(params[:record_id])
-      associations = build_associations(params.permit!.to_h)
+      model = params[:model].constantize
 
-      render json: ModelExplorer::Export.new(record: record, associations: associations)
-    rescue => error
-      render json: {error: error.message}, status: :bad_request
+      render json: ModelExplorer::Export.new(
+        record: build_record(model),
+        associations: ModelExplorer::Associations.build_from_params(params.permit!.to_h)
+      )
+    rescue => e
+      render json: {error: e.message}, status: :bad_request
     end
 
     private
 
-    def build_associations(associations_params)
-      associations = associations_params.dig("association_attributes", "associations") || {}
+    def build_record(model)
+      select = ModelExplorer::Select.new(model, params[:columns]).to_a
+      record = model.select(select).find(params[:record_id])
 
-      associations.map do |_index, association_params|
-        build_association(association_params)
-      end
-    end
-
-    def build_association(association_params)
-      attributes = association_params["association_attributes"]
-
-      {
-        name: attributes["name"],
-        scopes: attributes["scopes"],
-        associations: build_associations(association_params)
-      }
+      ModelExplorer::Record.new(record.attributes, model)
     end
   end
 end

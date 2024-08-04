@@ -6,20 +6,24 @@ module ModelExplorer
           name: name,
           type: macro,
           scopes: scopes,
-          count: relation.count,
+          count: records.count,
           records: export_records
         }
       end
 
-      def relation
+      def records
         ensure_valid_scopes!
 
-        scopes.inject(default_relation) do |relation, scope|
-          relation.public_send(scope)
-        end
+        super
       end
 
       private
+
+      def query
+        scopes.inject(default_query) do |relation, scope|
+          relation.public_send(scope)
+        end
+      end
 
       def scopes
         association[:scopes] || []

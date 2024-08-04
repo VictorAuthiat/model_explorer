@@ -12,8 +12,15 @@
       <div class="collapse show" id="associations-collapse-TEMP_ID">
         <div class="card-body" id="associations-container-TEMP_ID">
           <select
+            id="columns-select-TEMP_ID"
+            class="mb-3 p-0"
+            data-placeholder="<%= t(".select_columns") %>"
+            multiple
+          ></select>
+
+          <select
             id="scopes-select-TEMP_ID"
-            class="form-select mb-3"
+            class="mb-3 p-0"
             data-placeholder="<%= t(".select_scopes") %>"
             multiple
           ></select>
@@ -21,7 +28,7 @@
           <select
             id="associations-select-TEMP_ID"
             name="association_attributes[scopes][]"
-            class="form-select"
+            class="p-0"
             data-placeholder="<%= t(".select_associations") %>"
             multiple
           ></select>

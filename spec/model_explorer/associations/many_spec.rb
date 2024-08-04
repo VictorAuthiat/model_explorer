@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ModelExplorer::Associations::Many do
-  describe "build" do
+  describe "#export" do
     subject { association.export }
 
     let(:association) do
@@ -30,8 +30,8 @@ RSpec.describe ModelExplorer::Associations::Many do
     end
   end
 
-  describe "relation" do
-    subject { association.relation }
+  describe "#records" do
+    subject { association.records }
 
     let(:association) do
       described_class.new(
@@ -44,15 +44,14 @@ RSpec.describe ModelExplorer::Associations::Many do
     let(:user) { User.create!(name: "foo", email: "foo@bar.baz") }
     let!(:post) { user.posts.create!(title: "foo", content: "bar") }
 
-    it "returns the active record relation", :aggregate_failures do
-      expect(subject).to be_an(ActiveRecord::Relation)
-      expect(subject.first).to eq(post)
+    it "returns the an array of records", :aggregate_failures do
+      expect(subject).to be_an(Array)
+      expect(subject.first).to be_a(ModelExplorer::Record)
+      expect(subject.first[:id]).to eq(post.id)
       expect(subject.count).to eq(1)
     end
 
     context "when the association has an invalid scope" do
-      subject { association.relation }
-
       let(:association) do
         described_class.new(
           user,
@@ -69,8 +68,6 @@ RSpec.describe ModelExplorer::Associations::Many do
     end
 
     context "when the association has scopes" do
-      subject { association.relation }
-
       let(:association) do
         described_class.new(
           user,
@@ -84,8 +81,9 @@ RSpec.describe ModelExplorer::Associations::Many do
       let!(:published_comment) { user.comments.create!(content: "foo", status: "published", post: post) }
 
       it "returns the active record relation with the scope applied", :aggregate_failures do
-        expect(subject).to be_an(ActiveRecord::Relation)
-        expect(subject.first).to eq(published_comment)
+        expect(subject).to be_an(Array)
+        expect(subject.first).to be_a(ModelExplorer::Record)
+        expect(subject.first[:id]).to eq(published_comment.id)
         expect(subject.count).to eq(1)
       end
     end

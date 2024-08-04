@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ModelExplorer::Associations do
-  describe ".export" do
+  describe ".build" do
     subject { described_class.build(record, reflection, association) }
 
     let(:record) { double }
@@ -38,6 +38,40 @@ RSpec.describe ModelExplorer::Associations do
       it "raises an error" do
         expect { subject }.to raise_error("Unknown association foo")
       end
+    end
+  end
+
+  describe ".build_from_params" do
+    subject { described_class.build_from_params(associations_params) }
+
+    let(:associations_params) do
+      {
+        "association_attributes" => {
+          "associations" => {
+            "0" => {
+              "association_attributes" => {
+                "name" => "foo",
+                "scopes" => "bar",
+                "columns" => "baz",
+                "associations" => {}
+              }
+            }
+          }
+        }
+      }
+    end
+
+    it "returns an array of associations" do
+      expect(subject).to eq(
+        [
+          {
+            name: "foo",
+            scopes: "bar",
+            columns: "baz",
+            associations: []
+          }
+        ]
+      )
     end
   end
 end

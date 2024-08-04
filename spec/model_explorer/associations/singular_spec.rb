@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ModelExplorer::Associations::Singular do
-  describe "build" do
+  describe "#export" do
     subject { association.export }
 
     let(:association) do
@@ -28,8 +28,8 @@ RSpec.describe ModelExplorer::Associations::Singular do
     end
   end
 
-  describe "relation" do
-    subject { association.relation }
+  describe "#records" do
+    subject { association.records }
 
     let(:association) do
       described_class.new(
@@ -42,8 +42,10 @@ RSpec.describe ModelExplorer::Associations::Singular do
     let(:user) { User.create!(name: "foo", email: "foo@bar.baz") }
     let(:post) { user.posts.create!(title: "foo", content: "bar") }
 
-    it "returns the relation as an array" do
-      expect(subject).to eq([user])
+    it "returns the relation as an array", :aggregate_failures do
+      expect(subject).to be_an(Array)
+      expect(subject.first).to be_a(ModelExplorer::Record)
+      expect(subject.first[:id]).to eq(user.id)
     end
   end
 end

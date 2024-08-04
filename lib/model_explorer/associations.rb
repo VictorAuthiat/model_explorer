@@ -14,5 +14,20 @@ module ModelExplorer
         raise "Unknown association #{association[:name]}"
       end
     end
+
+    def self.build_from_params(associations_params)
+      associations = associations_params.dig("association_attributes", "associations") || {}
+
+      associations.map do |_index, association_params|
+        attributes = association_params["association_attributes"]
+
+        {
+          name: attributes["name"],
+          scopes: attributes["scopes"],
+          columns: attributes["columns"],
+          associations: build_from_params(association_params)
+        }
+      end
+    end
   end
 end

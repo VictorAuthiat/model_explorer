@@ -1,18 +1,24 @@
 require "rails_helper"
 
 RSpec.describe ModelExplorer::Associations::Base do
-  let(:association) { described_class.new(double, double, double) }
+  let(:base_association) do
+    described_class.new(
+      double("record"),
+      double("reflection", klass: User),
+      double("association")
+    )
+  end
 
-  describe "build" do
-    subject { association.export }
+  describe "#export" do
+    subject { base_association.export }
 
     it "raises an error" do
       expect { subject }.to raise_error(NotImplementedError)
     end
   end
 
-  describe "relation" do
-    subject { association.relation }
+  describe "#records" do
+    subject { base_association.records }
 
     it "raises an error" do
       expect { subject }.to raise_error(NotImplementedError)

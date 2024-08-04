@@ -5,7 +5,7 @@ RSpec.describe ModelExplorer::Export do
     subject { export }
 
     let(:export) { described_class.new(record: user, associations: associations) }
-    let(:user) { User.create!(email: "foo@bar.baz", password: "password") }
+    let(:user) { ModelExplorer::Record.new({email: "foo@bar.baz", password: "password"}, User) }
     let(:associations) { [{name: "posts", associations: []}] }
 
     it "initializes with a record and optional associations", :aggregate_failures do
@@ -27,7 +27,13 @@ RSpec.describe ModelExplorer::Export do
 
     before { allow(export).to receive(:data).and_return(fake_data) }
 
-    let(:export) { described_class.new(record: User.new) }
+    let(:export) do
+      described_class.new(
+        record: ModelExplorer::Record.new({}, User),
+        associations: []
+      )
+    end
+
     let(:fake_data) { {foo: "bar"} }
 
     it "returns data as a JSON formatted string" do
@@ -46,13 +52,15 @@ RSpec.describe ModelExplorer::Export do
     end
 
     let(:user) do
-      User.create!(email: "foo@bar.baz", password: "password")
+      db_user = User.create!(email: "foo@bar.baz", password: "password")
+
+      ModelExplorer::Record.new(db_user.attributes, User)
     end
 
     it "returns a JSON formatted string of the export data" do
       expect(subject).to match({
         model: "User",
-        attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
+        attributes: hash_including("email" => "foo@bar.baz", "encrypted_password" => "---FILTERED---"),
         associations: [
           {
             name: :posts,
@@ -80,7 +88,7 @@ RSpec.describe ModelExplorer::Export do
 
     context "when the record has associations and they are included in the export" do
       before do
-        Post.create!(user: user, title: "foo", content: "bar")
+        Post.create!(user_id: user[:id], title: "foo", content: "bar")
       end
 
       let(:export) do
@@ -96,7 +104,7 @@ RSpec.describe ModelExplorer::Export do
       it "returns a JSON formatted string of the export data" do
         expect(subject).to match({
           model: "User",
-          attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
+          attributes: hash_including("email" => user["email"], "encrypted_password" => "---FILTERED---"),
           associations: [
             {
               name: :posts,
@@ -143,15 +151,15 @@ RSpec.describe ModelExplorer::Export do
         end
 
         before do
-          post = Post.create!(user: user, title: "foo", content: "bar")
-          user.comments.create!(content: "baz", status: :draft, post: post)
-          user.comments.create!(content: "baz", status: :published, post: post)
+          post = Post.create!(user_id: user[:id], title: "foo", content: "bar")
+          Comment.create!(user_id: user[:id], content: "baz", status: :draft, post: post)
+          Comment.create!(user_id: user[:id], content: "baz", status: :published, post: post)
         end
 
         it "returns a JSON formatted string of the export data with the scoped records" do
           expect(subject).to match({
             model: "User",
-            attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
+            attributes: hash_including("email" => user[:email], "encrypted_password" => "---FILTERED---"),
             associations: [
               {
                 name: :comments,
@@ -161,7 +169,7 @@ RSpec.describe ModelExplorer::Export do
                 records: [
                   {
                     model: "Comment",
-                    attributes: hash_including("content" => "baz", "status" => "published"),
+                    attributes: hash_including("content" => "baz", "status" => 1),
                     associations: [
                       {
                         name: :post,
@@ -198,9 +206,9 @@ RSpec.describe ModelExplorer::Export do
         end
 
         before do
-          post = Post.create!(user: user, title: "foo", content: "bar")
-          user.comments.create!(content: "baz", status: :draft, post: post)
-          user.comments.create!(content: "baz", status: :published, post: post)
+          post = Post.create!(user_id: user[:id], title: "foo", content: "bar")
+          Comment.create!(user_id: user[:id], content: "baz", status: :draft, post: post)
+          Comment.create!(user_id: user[:id], content: "baz", status: :published, post: post)
         end
 
         it "raises an ArgumentError" do
@@ -211,7 +219,7 @@ RSpec.describe ModelExplorer::Export do
 
     context "when the record has associations but they are not included in the export" do
       before do
-        Post.create!(user: user, title: "foo", content: "bar")
+        Post.create!(user_id: user[:id], title: "foo", content: "bar")
       end
 
       let(:export) do
@@ -224,7 +232,7 @@ RSpec.describe ModelExplorer::Export do
       it "returns a JSON formatted string of the export data" do
         expect(subject).to match({
           model: "User",
-          attributes: hash_including("email" => user.email, "encrypted_password" => "---FILTERED---"),
+          attributes: hash_including("email" => user[:email], "encrypted_password" => "---FILTERED---"),
           associations: []
         })
       end

@@ -4,4 +4,5 @@ en:
       partials:
         select_template:
           select_associations: "Select associations"
+          select_columns: "Select columns"
           select_scopes: "Select scopes"

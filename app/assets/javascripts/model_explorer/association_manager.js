@@ -34,6 +34,9 @@ class AssociationManager {
     this._initializeNewAssociationSelect(newContainer, associationId, associationSelect);
     this._populateScopesSelect(newContainer, data.scopes, associationId);
     this._initializeNewScopeSelect(newContainer, associationId, associationSelect);
+
+    this._populateColumnsSelect(newContainer, data.columns, associationId);
+    this._initializeNewColumnsSelect(newContainer, associationId, associationSelect);
   }
 
   removeAssociation(associationSelect, association) {
@@ -134,5 +137,38 @@ class AssociationManager {
 
     associationSelect.associationContainer.appendChild(container);
     new TomSelect(`#scopes-select-${associationId}`, { maxItems: 5 });
+  }
+
+  _populateColumnsSelect(container, columns, associationId) {
+    const select = container.querySelector(`#columns-select-${associationId}`);
+
+    select.setAttribute('data-relation', associationId);
+
+    columns.forEach(column => {
+      const option = document.createElement('option');
+      option.value = column;
+      option.textContent = column;
+      select.appendChild(option);
+    });
+  }
+
+  _initializeNewColumnsSelect(container, associationId, associationSelect) {
+    const parentInputs = associationSelect.associationContainer.querySelectorAll('input:not([id*="ts-control"])');
+    const select = container.querySelector(`#columns-select-${associationId}`);
+
+    select.setAttribute('data-index', parentInputs.length - 1);
+
+    let name;
+
+    if ((parentInputs.length - 1) === 0) {
+      name = 'columns[]';
+    } else {
+      name = this._constructName(select, associationSelect).replace('[name]', '[columns][]');
+    }
+
+    select.name = name
+
+    associationSelect.associationContainer.appendChild(container);
+    new TomSelect(`#columns-select-${associationId}`);
   }
 }

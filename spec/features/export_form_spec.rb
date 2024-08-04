@@ -236,8 +236,80 @@ RSpec.feature "Export form", type: :feature do
                   "model" => "Comment",
                   "attributes" => hash_including(
                     "content" => "bar",
-                    "status" => "published"
+                    "status" => 1
                   ),
+                  "associations" => []
+                }]
+              }]
+            })
+          end
+        end
+      end
+    end
+  end
+
+  describe "Columns select" do
+    context "when user selects the user model" do
+      before do
+        model_select.click
+        user_option.click
+      end
+
+      context "and submit with the email column" do
+        before do
+          find("#columns-select-user-ts-control").click
+          find('div[data-value="email"]').click
+        end
+
+        it "shows the user export with only the email column and the primary key" do
+          fill_in "record_id", with: user.id
+          submit_button.click
+
+          aggregate_failures do
+            expect(json_data_pre).to be_visible
+            expect(JSON.parse(json_data_pre.text)).to match({
+              "model" => "User",
+              "attributes" => {
+                "id" => user.id,
+                "email" => user.email
+              },
+              "associations" => []
+            })
+          end
+        end
+      end
+
+      context "and submit with the posts association and the title column" do
+        before do
+          find("#associations-select-user-ts-control").click
+          find('div[data-value="posts"]').click
+          find("#columns-select-user-posts-ts-control").click
+          find('div[data-value="title"]').click
+        end
+
+        it "shows the user export with the posts and only selected columns" do
+          fill_in "record_id", with: user.id
+          submit_button.click
+
+          aggregate_failures do
+            expect(json_data_pre).to be_visible
+            expect(JSON.parse(json_data_pre.text)).to match({
+              "model" => "User",
+              "attributes" => hash_including(
+                "id" => user.id,
+                "email" => user.email
+              ),
+              "associations" => [{
+                "name" => "posts",
+                "type" => "has_many",
+                "scopes" => [],
+                "count" => 1,
+                "records" => [{
+                  "model" => "Post",
+                  "attributes" => {
+                    "id" => user_post.id,
+                    "title" => user_post.title
+                  },
                   "associations" => []
                 }]
               }]

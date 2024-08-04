@@ -3,15 +3,15 @@ module ModelExplorer
     attr_reader :record
     attr_reader :associations
 
-    # @param record [ActiveRecord::Base] Record to export
+    # @param record [ModelExplorer::Record] Record to export
     # @param associations [Array<Hash>] List of associations
     def initialize(record:, associations: [])
       @record = record
       @associations = associations
       @data = nil
 
-      unless record.is_a?(ApplicationRecord)
-        raise ArgumentError, "Record must be an ActiveRecord model"
+      unless record.is_a?(ModelExplorer::Record)
+        raise ArgumentError, "Record must be an instance of ModelExplorer::Record"
       end
     end
 
@@ -21,7 +21,7 @@ module ModelExplorer
 
     def data
       @data ||= {
-        model: record.class.name,
+        model: record.klass.name,
         attributes: filtered_attributes,
         associations: fetch_associations
       }
@@ -44,7 +44,7 @@ module ModelExplorer
 
     def fetch_associations
       associations.map do |association|
-        reflection = record.class.reflect_on_association(association[:name])
+        reflection = record.klass.reflect_on_association(association[:name])
 
         ModelExplorer::Associations.build(record, reflection, association).export
       end
