@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class ModelSerializer < ApplicationSerializer
-  attr_reader :model, :macro
+  attr_reader :model, :macro, :parent
 
-  def initialize(model:, macro:)
+  def initialize(model:, macro:, parent: nil)
     @model = model
     @macro = macro
+    @parent = parent
   end
 
   def to_h
@@ -30,7 +31,7 @@ class ModelSerializer < ApplicationSerializer
 
   def build_associations
     model.reflect_on_all_associations.filter_map do |association|
-      next if association.options[:through]
+      next if association.options[:through] || association.name.to_s == parent
 
       AssociationSerializer.new(association).to_h
     end

@@ -38,6 +38,9 @@ module ModelExplorer
     Import.new(record_data).import
   end
 
+  # List all models in the application
+  # excluding HABTM and abstract classes
+  # @return [Array<Class>]
   def self.models
     ApplicationRecord.descendants.reject do |descendant|
       descendant_name = descendant.name

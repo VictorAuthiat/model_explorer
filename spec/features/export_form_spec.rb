@@ -145,6 +145,14 @@ RSpec.feature "Export form", type: :feature do
         expect(page).to have_css("#associations-select-user-posts-ts-control")
       end
 
+      it "does not include the user option in the posts association select" do
+        expect(page).not_to have_css("#associations-select-user-posts option[value='user']")
+      end
+
+      it "includes the comments option in the posts association select" do
+        expect(page).to have_css("#associations-select-user-posts option[value='comments']")
+      end
+
       context "and removes the posts association" do
         before do
           find("div[data-value='posts']").click

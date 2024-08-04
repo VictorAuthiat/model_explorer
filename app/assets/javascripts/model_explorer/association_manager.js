@@ -6,9 +6,10 @@ class AssociationManager {
   async addAssociation(associationSelect, association) {
     try {
       const option = associationSelect.selectElement.querySelector(`option[value="${association}"]`);
+      const parent = associationSelect.selectElement.dataset.relation;
       const modelName = option.dataset.model || option.value;
       const macroName = option.dataset.macro;
-      const response = await fetch(`/model_explorer/models/${modelName}?macro=${macroName}`);
+      const response = await fetch(`/model_explorer/models/${modelName}?macro=${macroName}&parent=${parent}`);
       const data = await response.json();
 
       this.addAssociationsSelect(option, associationSelect, data);
