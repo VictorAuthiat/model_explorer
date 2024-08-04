@@ -3,7 +3,9 @@ class ModelsController {
     this.modelForm = new ModelForm({
       recordDetailsId: 'json-data',
       noRecordId: 'no-record',
-      formId: 'export-form'
+      formId: 'export-form',
+      recordDetailsLinkId: 'view-record-details',
+      downloadLinkId: 'download-record-details'
     });
 
     this.associationSelect = new AssociationSelect({

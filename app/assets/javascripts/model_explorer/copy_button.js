@@ -7,7 +7,7 @@ class CopyButton {
   initialize() {
     this.copyButton.addEventListener('click', () => {
       const textarea = document.createElement('textarea');
-      const copyText = this.copyButton.textContent;
+      const copyButtonHtml = this.copyButton.innerHTML;
 
       textarea.value = this.target.textContent;
       document.body.appendChild(textarea);
@@ -18,8 +18,8 @@ class CopyButton {
       this.copyButton.textContent = this.copyButton.dataset.text;
 
       setTimeout(() => {
-        this.copyButton.textContent = copyText;
-      }, 3000);
+        this.copyButton.innerHTML = copyButtonHtml;
+      }, 1000);
     });
   }
 }

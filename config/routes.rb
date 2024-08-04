@@ -4,5 +4,5 @@ ModelExplorer::Engine.routes.draw do
   root to: "models#index"
 
   resources :models, only: [:index, :show]
-  resources :exports, only: [:create]
+  resource :exports, only: [:show]
 end

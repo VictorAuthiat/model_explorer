@@ -1,34 +1,56 @@
 class ModelForm {
-  constructor({formId, recordDetailsId, noRecordId}) {
+  constructor({ formId, recordDetailsId, noRecordId, recordDetailsLinkId, downloadLinkId }) {
     this.form = document.getElementById(formId);
     this.recordDetails = document.getElementById(recordDetailsId);
     this.recordDetailsPre = this.recordDetails.querySelector('pre');
     this.noRecord = document.getElementById(noRecordId);
+    this.viewRecordDetailsLink = document.getElementById(recordDetailsLinkId);
+    this.downloadLink = document.getElementById(downloadLinkId);
   }
 
   initialize() {
     this.form.addEventListener('submit', async (event) => {
-      this.form.classList.add('was-validated');
+      this._handleFormValidation(event);
 
-      if (this.form.checkValidity() === false) {
-        event.preventDefault();
-        event.stopPropagation();
-        return;
-      } else {
-        event.preventDefault();
-      }
+      const response = await fetch(
+        this._collectFormData(),
+        { method: 'GET' }
+      ).then(response => response.text()).then(json => JSON.parse(json));
 
-      const response = await fetch(this.form.action, {
-        method: this.form.method,
-        body: new FormData(this.form)
-      });
-
-      const json = await response.text();
-
-      this.recordDetailsPre.textContent = JSON.stringify(JSON.parse(json), null, 3);
-      Prism.highlightElement(this.recordDetailsPre);
-      this.noRecord.classList.add('d-none');
-      this.recordDetails.classList.remove('d-none');
+      this._updateRecordDetails(response);
     });
+  }
+
+  _handleFormValidation(event) {
+    this.form.classList.add('was-validated');
+    if (!this.form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    } else {
+      event.preventDefault();
+    }
+  }
+
+  _collectFormData() {
+    const url = new URL(this.form.action);
+    const params = new URLSearchParams();
+    Array.from(this.form.elements).forEach(element => {
+      if (element.name && element.value) {
+        params.append(element.name, element.value);
+      }
+    });
+    url.search = params.toString();
+    return url;
+  }
+
+  _updateRecordDetails(parsedResponse) {
+    const content = parsedResponse.error === undefined ? parsedResponse.export : parsedResponse;
+
+    this.downloadLink.href = parsedResponse.path;
+    this.viewRecordDetailsLink.href = parsedResponse.path;
+    this.recordDetailsPre.textContent = JSON.stringify(content, null, 3);
+    Prism.highlightElement(this.recordDetailsPre);
+    this.noRecord.classList.add('d-none');
+    this.recordDetails.classList.remove('d-none');
   }
 }

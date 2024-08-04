@@ -4,15 +4,26 @@ module ModelExplorer
   class ExportsController < ApplicationController
     # Warning: all parameters are permitted.
     # Associations must not be called directly on the record.
-    def create
-      model = params[:model].constantize
+    def show
+      model_name = params[:model]
 
-      render json: ModelExplorer::Export.new(
-        record: build_record(model),
-        associations: ModelExplorer::Associations.build_from_params(params.permit!.to_h)
-      )
+      if model_names.include?(model_name)
+        export = ModelExplorer::Export.new(
+          record: build_record(model_name.constantize),
+          associations: ModelExplorer::Associations.build_from_params(params.permit!.to_h)
+        )
+
+        render json: {
+          export: export.data,
+          path: exports_path(params.except(:controller, :action))
+        }.to_json
+      else
+        render_bad_request("Model '#{model_name}' not found")
+      end
+    rescue ActiveRecord::RecordNotFound => e
+      render_not_found(e.message)
     rescue => e
-      render json: {error: e.message}, status: :bad_request
+      render_bad_request(e.message)
     end
 
     private

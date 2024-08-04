@@ -12,6 +12,20 @@ module ModelExplorer
       if: -> { ModelExplorer.basic_auth_enabled }
     )
 
+    protected
+
+    def model_names
+      ModelExplorer.models.map(&:name).sort
+    end
+
+    def render_not_found(error)
+      render json: {error: error}, status: :not_found
+    end
+
+    def render_bad_request(error)
+      render json: {error: error}, status: :bad_request
+    end
+
     private
 
     def verify_access

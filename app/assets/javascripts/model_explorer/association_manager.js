@@ -7,9 +7,8 @@ class AssociationManager {
     try {
       const option = associationSelect.selectElement.querySelector(`option[value="${association}"]`);
       const parent = associationSelect.selectElement.dataset.relation;
-      const modelName = option.dataset.model || option.value;
-      const macroName = option.dataset.macro;
-      const response = await fetch(`/model_explorer/models/${modelName}?macro=${macroName}&parent=${parent}`);
+      const requestPath = this._constructRequestPath(option, parent);
+      const response = await fetch(requestPath);
       const data = await response.json();
 
       this.addAssociationsSelect(option, associationSelect, data);
@@ -49,6 +48,17 @@ class AssociationManager {
       const fullAssociation = `${parentRelation}-${association}`;
       document.getElementById(`associations-accordion-${fullAssociation}`).remove();
     }
+  }
+
+  _constructRequestPath(option, parent) {
+    const modelName = option.dataset.model || option.value;
+    const macroName = option.dataset.macro;
+
+    let requestPath = `/model_explorer/models/${modelName}`;
+    requestPath += macroName ? `?macro=${macroName}` : '';
+    requestPath += parent ? `&parent=${parent}` : '';
+
+    return requestPath;
   }
 
   _constructRelationName(name) {

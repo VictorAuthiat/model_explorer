@@ -16,16 +16,10 @@ module ModelExplorer
           parent: params[:parent]
         ).to_json
       else
-        render json: {error: "Model '#{model_name}' not found"}, status: :not_found
+        render_not_found("Model '#{model_name}' not found")
       end
     rescue => e
-      render json: {error: e.message}, status: :bad_request
-    end
-
-    private
-
-    def model_names
-      ModelExplorer.models.map(&:name).sort
+      render_bad_request(e.message)
     end
   end
 end

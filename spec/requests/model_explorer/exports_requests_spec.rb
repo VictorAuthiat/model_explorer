@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe "POST /model_explorer/export", type: :request do
+RSpec.describe "GET /model_explorer/export", type: :request do
   subject do
-    post exports_path, params: params
+    get exports_path, params: params
     response
   end
 
@@ -19,7 +19,7 @@ RSpec.describe "POST /model_explorer/export", type: :request do
 
     it "returns an error message" do
       subject
-      expect(JSON.parse(response.body)["error"]).to be_present
+      expect(JSON.parse(response.body)["error"]).to eq("Model 'Unknown' not found")
     end
   end
 
@@ -36,7 +36,7 @@ RSpec.describe "POST /model_explorer/export", type: :request do
 
     it "returns an error message" do
       subject
-      expect(JSON.parse(response.body)["error"]).to be_present
+      expect(JSON.parse(response.body)["error"]).to eq("Model 'RailsApp::Application' not found")
     end
   end
 
@@ -44,7 +44,7 @@ RSpec.describe "POST /model_explorer/export", type: :request do
     let(:params) do
       {
         model: "User",
-        record_id: 1,
+        record_id: user.id,
         association_attributes: {}
       }
     end
@@ -52,6 +52,14 @@ RSpec.describe "POST /model_explorer/export", type: :request do
     before do
       allow(ModelExplorer::Export).to(
         receive(:new).and_raise(StandardError, "Unknown error")
+      )
+    end
+
+    let!(:user) do
+      User.create!(
+        name: "foo",
+        email: "bar@baz.buz",
+        posts: [Post.new(title: "foo", content: "bar")]
       )
     end
 
@@ -72,7 +80,7 @@ RSpec.describe "POST /model_explorer/export", type: :request do
       }
     end
 
-    it { is_expected.to have_http_status(:bad_request) }
+    it { is_expected.to have_http_status(:not_found) }
 
     it "returns an error message" do
       subject
@@ -103,15 +111,19 @@ RSpec.describe "POST /model_explorer/export", type: :request do
       it "returns the user export without associations" do
         subject
 
-        expect(JSON.parse(response.body)).to match(
-          {
-            "model" => "User",
-            "attributes" => hash_including(
-              "name" => "foo",
-              "email" => "bar@baz.buz"
-            ),
-            "associations" => []
-          }
+        expect([JSON.parse(response.body)]).to include(
+          hash_including(
+            "export" => {
+              "model" => "User",
+              "attributes" => hash_including(
+                "id" => 1,
+                "name" => "foo",
+                "email" => "bar@baz.buz",
+                "encrypted_password" => "---FILTERED---"
+              ),
+              "associations" => []
+            }
+          )
         )
       end
     end
@@ -169,32 +181,36 @@ RSpec.describe "POST /model_explorer/export", type: :request do
       it "returns the user export with associations" do
         subject
 
-        expect(JSON.parse(response.body)).to match(
-          {
-            "model" => "User",
-            "attributes" => hash_including(
-              "name" => "foo",
-              "email" => "bar@baz.buz"
-            ),
-            "associations" => [
-              {
-                "name" => "posts",
-                "type" => "has_many",
-                "scopes" => [],
-                "count" => 1,
-                "records" => [
-                  {
-                    "model" => "Post",
-                    "attributes" => hash_including(
-                      "title" => "foo",
-                      "content" => "bar"
-                    ),
-                    "associations" => []
-                  }
-                ]
-              }
-            ]
-          }
+        expect([JSON.parse(response.body)]).to include(
+          hash_including(
+            "export" => {
+              "model" => "User",
+              "attributes" => hash_including(
+                "id" => 1,
+                "name" => "foo",
+                "email" => "bar@baz.buz",
+                "encrypted_password" => "---FILTERED---"
+              ),
+              "associations" => [
+                {
+                  "name" => "posts",
+                  "type" => "has_many",
+                  "scopes" => [],
+                  "count" => 1,
+                  "records" => [
+                    {
+                      "model" => "Post",
+                      "attributes" => hash_including(
+                        "title" => "foo",
+                        "content" => "bar"
+                      ),
+                      "associations" => []
+                    }
+                  ]
+                }
+              ]
+            }
+          )
         )
       end
     end
