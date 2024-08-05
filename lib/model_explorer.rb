@@ -25,6 +25,16 @@ module ModelExplorer
   mattr_accessor :basic_auth_username, default: "admin"
   mattr_accessor :basic_auth_password, default: "password"
 
+  # Maximum number of items to select per association
+  # Disable by setting to 0
+  # @param max_items_per_association [Integer]
+  mattr_accessor :max_items_per_association, default: 5
+
+  # Maximum number of scopes to select per association
+  # Disable by setting to 0
+  # @param max_scopes_per_association [Integer]
+  mattr_accessor :max_scopes_per_association, default: 5
+
   def self.configure
     yield(self)
   end
@@ -49,5 +59,19 @@ module ModelExplorer
         descendant_name.match(/HABTM/) ||
         descendant.abstract_class?
     end
+  end
+
+  # Check if the association select is enabled
+  # @return [TrueClass, FalseClass]
+  #  true if the max_items_per_association is positive
+  def self.association_select_enabled?
+    max_items_per_association.positive?
+  end
+
+  # Check if the association scopes are enabled
+  # @return [TrueClass, FalseClass]
+  # true if the max_scopes_per_association is positive
+  def self.association_scopes_enabled?
+    max_scopes_per_association.positive?
   end
 end

@@ -10,7 +10,13 @@ class ModelForm {
 
   initialize() {
     this.form.addEventListener('submit', async (event) => {
-      this._handleFormValidation(event);
+      event.preventDefault();
+
+      this.form.classList.add('was-validated');
+
+      if (!this.form.checkValidity()) {
+        return;
+      }
 
       const response = await fetch(
         this._collectFormData(),
@@ -21,25 +27,24 @@ class ModelForm {
     });
   }
 
-  _handleFormValidation(event) {
-    this.form.classList.add('was-validated');
-    if (!this.form.checkValidity()) {
-      event.preventDefault();
-      event.stopPropagation();
-    } else {
-      event.preventDefault();
-    }
-  }
-
   _collectFormData() {
     const url = new URL(this.form.action);
     const params = new URLSearchParams();
+
     Array.from(this.form.elements).forEach(element => {
-      if (element.name && element.value) {
-        params.append(element.name, element.value);
+      if (element.name) {
+        if (element.multiple) {
+          Array.from(element.selectedOptions).forEach(option => {
+            params.append(element.name, option.value);
+          });
+        } else {
+          params.append(element.name, element.value);
+        }
       }
     });
+
     url.search = params.toString();
+
     return url;
   }
 

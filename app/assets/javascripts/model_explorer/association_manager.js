@@ -1,6 +1,8 @@
 class AssociationManager {
   constructor({ templateId }) {
     this.template = document.getElementById(templateId);
+    this.maxItems = this.template.dataset.maxItems || 5;
+    this.maxScopes = this.template.dataset.maxScopes || 5;
   }
 
   async addAssociation(associationSelect, association) {
@@ -34,7 +36,6 @@ class AssociationManager {
     this._initializeNewAssociationSelect(newContainer, associationId, associationSelect);
     this._populateScopesSelect(newContainer, data.scopes, associationId);
     this._initializeNewScopeSelect(newContainer, associationId, associationSelect);
-
     this._populateColumnsSelect(newContainer, data.columns, associationId);
     this._initializeNewColumnsSelect(newContainer, associationId, associationSelect);
   }
@@ -96,6 +97,8 @@ class AssociationManager {
   _populateAssociationsSelect(container, associations, associationId) {
     const select = container.querySelector(`#associations-select-${associationId}`);
 
+    if (!select) return;
+
     select.setAttribute('data-relation', associationId);
 
     associations.forEach(assoc => {
@@ -110,6 +113,8 @@ class AssociationManager {
 
   _populateScopesSelect(container, scopes, associationId) {
     const select = container.querySelector(`#scopes-select-${associationId}`);
+
+    if (!select) return;
 
     select.setAttribute('data-relation', associationId);
 
@@ -130,12 +135,14 @@ class AssociationManager {
       parentId: associationSelect.selectElement.id
     });
 
-    newAssociationSelect.initialize(this, { maxItems: 5 });
+    newAssociationSelect.initialize(this, { maxItems: this.maxItems });
   }
 
   _initializeNewScopeSelect(container, associationId, associationSelect) {
     const parentInputs = associationSelect.associationContainer.querySelectorAll('input:not([id*="ts-control"])');
     const select = container.querySelector(`#scopes-select-${associationId}`);
+
+    if (!select) return;
 
     if (select.children.length === 0 || (parentInputs.length - 1) === 0) {
       select.remove();
@@ -147,7 +154,7 @@ class AssociationManager {
     select.name = name
 
     associationSelect.associationContainer.appendChild(container);
-    new TomSelect(`#scopes-select-${associationId}`, { maxItems: 5 });
+    new TomSelect(`#scopes-select-${associationId}`, { maxItems: this.maxScopes });
   }
 
   _populateColumnsSelect(container, columns, associationId) {

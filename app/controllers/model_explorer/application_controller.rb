@@ -14,16 +14,18 @@ module ModelExplorer
 
     protected
 
-    def model_names
-      ModelExplorer.models.map(&:name).sort
-    end
-
     def render_not_found(error)
-      render json: {error: error}, status: :not_found
+      render json: {error: error.message}, status: :not_found
     end
 
     def render_bad_request(error)
-      render json: {error: error}, status: :bad_request
+      render json: {error: error.message}, status: :bad_request
+    end
+
+    def ensure_valid_model_name(model_name = nil)
+      return if ModelExplorer.models.map(&:name).include?(model_name)
+
+      raise "Model '#{model_name}' not found"
     end
 
     private

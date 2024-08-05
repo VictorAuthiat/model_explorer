@@ -14,10 +14,17 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require "rspec/rails"
 require "capybara/rspec"
 
+download_path = Rails.root.join("tmp", "downloads")
+
 Capybara.register_driver(:selenium_chrome) do |app|
   options = Selenium::WebDriver::Chrome::Options.new(
     args: %w[--disable-search-engine-choice-screen]
   )
+
+  options.add_preference(:download, {
+    "prompt_for_download" => false,
+    "default_directory" => download_path.to_s
+  })
 
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
@@ -31,6 +38,11 @@ Capybara.register_driver(:selenium_chrome_headless) do |app|
       --disable-search-engine-choice-screen
     ]
   )
+
+  options.add_preference(:download, {
+    "prompt_for_download" => false,
+    "default_directory" => download_path.to_s
+  })
 
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
@@ -76,6 +88,13 @@ RSpec.configure do |config|
   config.around(:each) do |example|
     I18n.with_locale(:fr) { example.run }
   end
+
+  config.before(:each) do
+    FileUtils.rm_rf(download_path)
+    FileUtils.mkdir_p(download_path)
+  end
+
+  config.add_setting(:download_path, default: download_path)
 
   config.include ModelExplorer::Engine.routes.url_helpers, type: :request
   config.include Devise::Test::IntegrationHelpers, type: :request

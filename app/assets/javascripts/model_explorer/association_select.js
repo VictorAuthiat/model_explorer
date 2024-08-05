@@ -9,6 +9,8 @@ class AssociationSelect {
   }
 
   initialize(manager, options = {}) {
+    if (!this.selectElement) return;
+
     new TomSelect(
       this.selectElement,
       {

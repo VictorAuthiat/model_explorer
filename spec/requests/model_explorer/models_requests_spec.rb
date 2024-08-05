@@ -80,7 +80,7 @@ RSpec.describe "GET /model_explorer/models/:id", type: :request do
   context "when the model does not exist" do
     let(:model) { "Unknown" }
 
-    it { is_expected.to have_http_status(:not_found) }
+    it { is_expected.to have_http_status(:bad_request) }
 
     it "returns an error message" do
       expect(json_response["error"]).to eq("Model 'Unknown' not found")

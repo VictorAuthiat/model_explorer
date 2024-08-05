@@ -60,4 +60,56 @@ RSpec.describe ModelExplorer do
       expect(subject).not_to include(ApplicationRecord)
     end
   end
+
+  describe ".association_select_enabled?" do
+    subject { described_class.association_select_enabled? }
+
+    context "when max_items_per_association is positive" do
+      around do |example|
+        default = ModelExplorer.max_items_per_association
+        ModelExplorer.max_items_per_association = 1
+        example.run
+        ModelExplorer.max_items_per_association = default
+      end
+
+      it { is_expected.to eq(true) }
+    end
+
+    context "when max_items_per_association is zero" do
+      around do |example|
+        default = ModelExplorer.max_items_per_association
+        ModelExplorer.max_items_per_association = 0
+        example.run
+        ModelExplorer.max_items_per_association = default
+      end
+
+      it { is_expected.to eq(false) }
+    end
+  end
+
+  describe ".association_scopes_enabled?" do
+    subject { described_class.association_scopes_enabled? }
+
+    context "when max_scopes_per_association is positive" do
+      around do |example|
+        default = ModelExplorer.max_scopes_per_association
+        ModelExplorer.max_scopes_per_association = 1
+        example.run
+        ModelExplorer.max_scopes_per_association = default
+      end
+
+      it { is_expected.to eq(true) }
+    end
+
+    context "when max_scopes_per_association is zero" do
+      around do |example|
+        default = ModelExplorer.max_scopes_per_association
+        ModelExplorer.max_scopes_per_association = 0
+        example.run
+        ModelExplorer.max_scopes_per_association = default
+      end
+
+      it { is_expected.to eq(false) }
+    end
+  end
 end

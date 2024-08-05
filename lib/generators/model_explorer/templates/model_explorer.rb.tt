@@ -13,4 +13,12 @@ ModelExplorer.configure do |config|
 
   # Customize the regular expression for filtering attributes.
   # config.filter_attributes_regexp = /password|token|secret/i
+
+  # Set the maximum number of items to select per association.
+  # Disable by setting to 0.
+  # config.max_items_per_association = 5
+
+  # Set the maximum number of scopes to select per association.
+  # Disable by setting to 0.
+  # config.max_scopes_per_association = 5
 end

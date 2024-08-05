@@ -3,11 +3,13 @@ require "rails_helper"
 RSpec.feature "Export form", type: :feature do
   before { visit "/model_explorer/models" }
 
-  let(:submit_button) { find("#export-form input[type=submit]") }
-  let(:model_select)  { find("#association-select-ts-control") }
-  let(:user_option)   { find('div[data-value="User"]') }
-  let(:copy_button)   { find("#copy-record-details") }
-  let(:json_data_pre) { find("#json-pre") }
+  let(:submit_button)   { find("#export-form input[type=submit]") }
+  let(:model_select)    { find("#association-select-ts-control") }
+  let(:user_option)     { find('div[data-value="User"]') }
+  let(:copy_button)     { find("#copy-record-details") }
+  let(:view_button)     { find("#view-record-details") }
+  let(:download_button) { find("#download-record-details") }
+  let(:json_data_pre)   { find("#json-pre") }
 
   let!(:user) do
     User.create!(email: "foo@bar.baz", password: "password")
@@ -88,6 +90,39 @@ RSpec.feature "Export form", type: :feature do
           ),
           "associations" => []
         })
+      end
+
+      context "and the user clicks the 'Download' button" do
+        subject(:click_download_button) do
+          download_button.click
+          sleep 0.5
+        end
+
+        before do
+          submit_button.click
+        end
+
+        it "downloads the JSON data", :aggregate_failures do
+          expect(Dir[RSpec.configuration.download_path.join("*")]).to be_empty
+          click_download_button
+          expect(Dir[RSpec.configuration.download_path.join("*")]).not_to be_empty
+        end
+      end
+
+      context "and the user clicks the 'View' button" do
+        subject(:click_view_button) do
+          view_button.click
+        end
+
+        before do
+          submit_button.click
+        end
+
+        it "opens the JSON data in a new tab", :aggregate_failures do
+          expect(page.driver.browser.window_handles.size).to eq(1)
+          click_view_button
+          expect(page.driver.browser.window_handles.size).to eq(2)
+        end
       end
 
       context "and the user clicks the 'Copy' button" do
