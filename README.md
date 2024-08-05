@@ -81,6 +81,31 @@ end
 
 By default, the `filter_attributes_regexp` is set to `/password|secret/token/i`.
 
+
+## Maximum Items per Association
+
+Set the maximum number of options in association selects
+
+```ruby
+ModelExplorer.configure do |config|
+  config.max_items_per_association = 5
+end
+```
+
+To completely disable association dropdowns (i.e., the select will not be displayed in the search form), set the maximum items to 0.
+
+## Maximum Scopes per Association
+
+Control the number of scopes available in scope dropdowns by configuring the maximum allowed as follows:
+
+```ruby
+ModelExplorer.configure do |config|
+  config.max_scopes_per_association = 5
+end
+```
+
+Similar to item associations, scopes can also be completely disabled by setting the maximum to 0.
+
 ## Importing data
 
 You can import data as follows:
