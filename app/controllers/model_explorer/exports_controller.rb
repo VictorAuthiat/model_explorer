@@ -36,7 +36,18 @@ module ModelExplorer
       select = ModelExplorer::Select.new(model, params[:columns]).to_a
       record = model.select(select).find(params[:record_id])
 
-      ModelExplorer::Record.new(record.attributes, model)
+      attributes =
+        if params[:columns].present?
+          record.attributes.slice(*params[:columns])
+        else
+          record.attributes
+        end
+
+      ModelExplorer::Record.new(
+        record.attributes[model.primary_key],
+        attributes,
+        model
+      )
     end
   end
 end

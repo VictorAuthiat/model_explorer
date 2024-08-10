@@ -304,7 +304,7 @@ RSpec.feature "Export form", type: :feature do
           find('div[data-value="email"]').click
         end
 
-        it "shows the user export with only the email column and the primary key" do
+        it "shows the user export with only the email column" do
           fill_in "record_id", with: user.id
           submit_button.click
 
@@ -312,10 +312,7 @@ RSpec.feature "Export form", type: :feature do
             expect(json_data_pre).to be_visible
             expect(JSON.parse(json_data_pre.text)).to match({
               "model" => "User",
-              "attributes" => {
-                "id" => user.id,
-                "email" => user.email
-              },
+              "attributes" => {"email" => user.email},
               "associations" => []
             })
           end
@@ -330,7 +327,7 @@ RSpec.feature "Export form", type: :feature do
           find('div[data-value="title"]').click
         end
 
-        it "shows the user export with the posts and only selected columns" do
+        it "shows the user export with the posts and only title column" do
           fill_in "record_id", with: user.id
           submit_button.click
 
@@ -350,7 +347,6 @@ RSpec.feature "Export form", type: :feature do
                 "records" => [{
                   "model" => "Post",
                   "attributes" => {
-                    "id" => user_post.id,
                     "title" => user_post.title
                   },
                   "associations" => []

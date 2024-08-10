@@ -5,7 +5,7 @@ RSpec.describe ModelExplorer::Export do
     subject { export }
 
     let(:export) { described_class.new(record: user, associations: associations) }
-    let(:user) { ModelExplorer::Record.new({email: "foo@bar.baz", password: "password"}, User) }
+    let(:user) { ModelExplorer::Record.new(1, {email: "foo@bar.baz", password: "password"}, User) }
     let(:associations) { [{name: "posts", associations: []}] }
 
     it "initializes with a record and optional associations", :aggregate_failures do
@@ -29,7 +29,7 @@ RSpec.describe ModelExplorer::Export do
 
     let(:export) do
       described_class.new(
-        record: ModelExplorer::Record.new({}, User),
+        record: ModelExplorer::Record.new(1, {}, User),
         associations: []
       )
     end
@@ -54,7 +54,7 @@ RSpec.describe ModelExplorer::Export do
     let(:user) do
       db_user = User.create!(email: "foo@bar.baz", password: "password")
 
-      ModelExplorer::Record.new(db_user.attributes, User)
+      ModelExplorer::Record.new(db_user.id, db_user.attributes, User)
     end
 
     it "returns a JSON formatted string of the export data" do
