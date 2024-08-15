@@ -1,6 +1,8 @@
 # ModelExplorer
 
 [![Build Status](https://github.com/victorauthiat/model_explorer/actions/workflows/build.yml/badge.svg)](https://github.com/victorauthiat/model_explorer/actions/workflows/build.yml)
+[![Maintainability](https://api.codeclimate.com/v1/badges/9642bd2f42a045505fc2/maintainability)](https://codeclimate.com/github/VictorAuthiat/model_explorer/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/9642bd2f42a045505fc2/test_coverage)](https://codeclimate.com/github/VictorAuthiat/model_explorer/test_coverage)
 
 Rails gem to explore models attributes and their associations.
 
