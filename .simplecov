@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "simplecov-json"
+require "simplecov_json_formatter"
 require "model_explorer"
 
 SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([
